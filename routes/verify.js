@@ -123,7 +123,7 @@ router.post("/", upload.single("image"), async (req, res) => {
       return;
     }
 
-    if (bestMatch.label !== email) {
+    if (bestMatch.label !== username) {
       res.status(400).json({
         matched: false,
         identifiedAs: bestMatch.label,
