@@ -1,0 +1,10 @@
+.env
+.env*
+
+# dependencies
+/node_modules
+node_modules
+
+.vscode/
+.idea/
+.DS_Store
