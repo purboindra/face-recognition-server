@@ -3,7 +3,7 @@ var express = require("express");
 var path = require("path");
 var cookieParser = require("cookie-parser");
 var logger = require("morgan");
-
+var registerRouter = require("./routes/register");
 require("dotenv").config();
 
 const { initializeAppWrite } = require("./appwrite");
@@ -21,6 +21,8 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, "public")));
+
+app.use("/register", registerRouter);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
