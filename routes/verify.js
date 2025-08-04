@@ -13,6 +13,10 @@ const { client } = require("../appwrite");
 const { InputFile } = require("node-appwrite/file");
 const { Databases, Query, ID, Storage } = require("node-appwrite");
 const { fsync } = require("fs");
+const {
+  APPWRITE_USER_DATABASE_ID,
+  APPWRITE_USER_COLLECTION_ID,
+} = require("./constants");
 
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
@@ -71,8 +75,8 @@ router.post("/", upload.single("image"), async (req, res) => {
 
   try {
     const users = await databases.listDocuments(
-      process.env.APPWRITE_USER_DATABASE_ID,
-      process.env.APPWRITE_USER_COLLECTION_ID
+      APPWRITE_USER_DATABASE_ID,
+      APPWRITE_USER_COLLECTION_ID
     );
 
     const labeledDescriptors = users.documents.map((user) => {
@@ -82,8 +86,8 @@ router.post("/", upload.single("image"), async (req, res) => {
     });
 
     const user = await databases.listDocuments(
-      process.env.APPWRITE_USER_DATABASE_ID,
-      process.env.APPWRITE_USER_COLLECTION_ID,
+      APPWRITE_USER_DATABASE_ID,
+      APPWRITE_USER_COLLECTION_ID,
       [Query.equal("userName", [username])]
     );
 

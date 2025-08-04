@@ -9,6 +9,11 @@ const canvas = require("canvas");
 const { client } = require("../appwrite");
 const { InputFile } = require("node-appwrite/file");
 const { Databases, Query, ID, Storage } = require("node-appwrite");
+const {
+  APPWRITE_USER_DATABASE_ID,
+  APPWRITE_USER_COLLECTION_ID,
+  APPWRITE_BUCKER_ID,
+} = require("./constants");
 
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
@@ -66,8 +71,8 @@ router.post("/", upload.single("image"), async (req, res) => {
   }
 
   const user = await databases.listDocuments(
-    process.env.APPWRITE_USER_DATABASE_ID,
-    process.env.APPWRITE_USER_COLLECTION_ID,
+    APPWRITE_USER_DATABASE_ID,
+    APPWRITE_USER_COLLECTION_ID,
     [Query.equal("userName", [username])]
   );
 
@@ -161,8 +166,8 @@ router.post("/", upload.single("image"), async (req, res) => {
     const descriptor = Array.from(resultDescriptor.descriptor);
 
     const notCurrentUsers = await databases.listDocuments(
-      process.env.APPWRITE_USER_DATABASE_ID,
-      process.env.APPWRITE_USER_COLLECTION_ID,
+      APPWRITE_USER_DATABASE_ID,
+      APPWRITE_USER_COLLECTION_ID,
       [Query.notEqual("userName", [username])]
     );
 
@@ -194,16 +199,16 @@ router.post("/", upload.single("image"), async (req, res) => {
     const nodeFile = InputFile.fromPath(file.path, `${username}.jpg`);
 
     const responseFile = await storage.createFile(
-      process.env.APPWRITE_BUCKER_ID,
+      APPWRITE_BUCKER_ID,
       ID.unique(),
       nodeFile
     );
 
-    const imageUrl = `https://fra.cloud.appwrite.io/v1/storage/buckets/${process.env.APPWRITE_BUCKER_ID}/files/${responseFile.$id}/view?project=${process.env.APPWRITE_PROJECT_ID}`;
+    const imageUrl = `https://fra.cloud.appwrite.io/v1/storage/buckets/${APPWRITE_BUCKER_ID}/files/${responseFile.$id}/view?project=${APPWRITE_PROJECT_ID}`;
 
     await databases.createDocument(
-      process.env.APPWRITE_USER_DATABASE_ID,
-      process.env.APPWRITE_USER_COLLECTION_ID,
+      APPWRITE_USER_DATABASE_ID,
+      APPWRITE_USER_COLLECTION_ID,
       ID.unique(),
       {
         userName: username,
