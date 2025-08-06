@@ -61,11 +61,18 @@ router.post("/", upload.single("image"), async (req, res) => {
     return;
   }
 
-  const { username } = req.body;
+  const { username, longitude, latitude } = req.body;
 
   if (!username) {
     res.status(400).json({
       message: "Username is required",
+    });
+    return;
+  }
+
+  if (!longitude || !latitude) {
+    res.status(400).json({
+      message: "Location is required",
     });
     return;
   }
@@ -214,6 +221,8 @@ router.post("/", upload.single("image"), async (req, res) => {
         userName: username,
         descriptor: descriptor,
         imageUrl: imageUrl,
+        longitude: longitude,
+        latitude: latitude,
       }
     );
 
