@@ -12,9 +12,7 @@ const faceapi = require("face-api.js");
 const canvas = require("canvas");
 
 const { client } = require("../appwrite");
-const { InputFile } = require("node-appwrite/file");
 const { Databases, Query, ID, Storage } = require("node-appwrite");
-const { fsync } = require("fs");
 const {
   APPWRITE_USER_DATABASE_ID,
   APPWRITE_USER_COLLECTION_ID,
@@ -61,7 +59,7 @@ router.post("/", upload.single("image"), async (req, res) => {
 
   if (!file) {
     res.status(400).json({
-      message: "Image is required",
+      message: "Tidak ada wajah yang terdeteksi",
     });
     return;
   }
@@ -70,7 +68,7 @@ router.post("/", upload.single("image"), async (req, res) => {
 
   if (!username) {
     res.status(400).json({
-      message: "Username is required",
+      message: "Username diperlukan",
     });
     return;
   }
@@ -95,7 +93,8 @@ router.post("/", upload.single("image"), async (req, res) => {
 
     if (user.total === 0) {
       res.status(400).json({
-        message: "No face registered for this email",
+        message: "Username ini belum terdaftar",
+        code: "USER_NOT_FOUND",
       });
       return;
     }
@@ -109,7 +108,7 @@ router.post("/", upload.single("image"), async (req, res) => {
 
     if (!singleResult) {
       res.status(400).json({
-        message: "No face detected",
+        message: "Tidak dapat mendeteksi wajah",
         code: "DETECTING_DESCRIPTOR_ERROR",
       });
       return;
@@ -124,7 +123,7 @@ router.post("/", upload.single("image"), async (req, res) => {
         matched: false,
         label: null,
         distance: bestMatch.distance,
-        message: "Oops.. face not recognized.",
+        message: "Wajah ini belum terdaftar",
       });
       return;
     }
@@ -134,7 +133,7 @@ router.post("/", upload.single("image"), async (req, res) => {
         matched: false,
         identifiedAs: bestMatch.label,
         distance: bestMatch.distance,
-        message: `Oops.. this face belongs to ${bestMatch.label}`,
+        message: `Wajah ini terdaftar sebagai ${bestMatch.label}`,
       });
       return;
     }
@@ -143,12 +142,12 @@ router.post("/", upload.single("image"), async (req, res) => {
       matched: true,
       identifiedAs: bestMatch.label,
       distance: bestMatch.distance,
-      message: "Face verified successfully",
+      message: "Verifikasi wajah berhasil",
     });
   } catch (error) {
     console.error("Error register face", error);
     res.status(500).json({
-      message: "Error register face",
+      message: "Terjadi kesalahan saat memverifikasi wajah",
     });
     return;
   } finally {
