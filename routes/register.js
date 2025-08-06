@@ -141,10 +141,11 @@ router.post("/", upload.single("image"), async (req, res) => {
     const offsetX = Math.abs(imageCenterX - faceCenterX);
 
     if (offsetX > img.width * 0.2) {
-      return res.status(400).json({
+      res.status(400).json({
         message: "Please center your face in the frame",
         code: "ERROR_FACE_NOT_CENTERED",
       });
+      return;
     }
 
     const canvasInstance = canvas.createCanvas(img.width, img.height);
@@ -164,10 +165,11 @@ router.post("/", upload.single("image"), async (req, res) => {
     const averageBrightness = totalBrightness / (imageData.length / 4);
 
     if (averageBrightness < 40) {
-      return res.status(400).json({
+      res.status(400).json({
         message: "Image too dark, please ensure better lighting",
         code: "ERROR_LOW_LIGHT",
       });
+      return;
     }
 
     const descriptor = Array.from(resultDescriptor.descriptor);
