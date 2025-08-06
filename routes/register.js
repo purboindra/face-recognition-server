@@ -1,6 +1,10 @@
+require("dotenv").config();
+
 var express = require("express");
 var router = express.Router();
 var multer = require("multer");
+
+var fs = require("fs");
 
 var path = require("path");
 
@@ -13,6 +17,7 @@ const {
   APPWRITE_USER_DATABASE_ID,
   APPWRITE_USER_COLLECTION_ID,
   APPWRITE_BUCKER_ID,
+  APPWRITE_PROJECT_ID,
 } = require("./constants");
 
 const storage = multer.diskStorage({
@@ -56,7 +61,7 @@ router.post("/", upload.single("image"), async (req, res) => {
 
   if (!file) {
     res.status(400).json({
-      message: "Image is required",
+      message: "Tidak ada wajah yang terdeteksi",
     });
     return;
   }
@@ -65,14 +70,14 @@ router.post("/", upload.single("image"), async (req, res) => {
 
   if (!username) {
     res.status(400).json({
-      message: "Username is required",
+      message: "Username diperlukan",
     });
     return;
   }
 
   if (!longitude || !latitude) {
     res.status(400).json({
-      message: "Location is required",
+      message: "Lokasi diperlukan",
     });
     return;
   }
@@ -87,7 +92,7 @@ router.post("/", upload.single("image"), async (req, res) => {
 
   if (user.documents.length > 0) {
     res.status(400).json({
-      message: "Username already registered",
+      message: "Username ini sudah terdaftar",
     });
     return;
   }
@@ -102,7 +107,7 @@ router.post("/", upload.single("image"), async (req, res) => {
 
     if (detections.length !== 1) {
       res.status(400).json({
-        message: "Please ensure only your face is in the frame",
+        message: "Hanya diperbolehkan satu wajah yang terdeteksi",
         code: "ERROR_MANY_FACES",
       });
       return;
@@ -115,7 +120,7 @@ router.post("/", upload.single("image"), async (req, res) => {
 
     if (!resultDescriptor) {
       res.status(400).json({
-        message: "No face detected",
+        message: "Tidak dapat mendeteksi wajah",
         code: "DETECTING_DESCRIPTOR_ERROR",
       });
       return;
@@ -128,7 +133,7 @@ router.post("/", upload.single("image"), async (req, res) => {
 
     if (!leftEye || !rightEye || Math.abs(leftEye[0].x - rightEye[0].x) < 10) {
       res.status(400).json({
-        message: "Please face the camera directly (frontal view required)",
+        message: "Pastikan wajah terlihat jelas",
         code: "ERROR_NO_FACE",
       });
       return;
@@ -142,7 +147,7 @@ router.post("/", upload.single("image"), async (req, res) => {
 
     if (offsetX > img.width * 0.2) {
       res.status(400).json({
-        message: "Please center your face in the frame",
+        message: "Posisikan wajah di tengah kamera/frame",
         code: "ERROR_FACE_NOT_CENTERED",
       });
       return;
@@ -166,7 +171,7 @@ router.post("/", upload.single("image"), async (req, res) => {
 
     if (averageBrightness < 40) {
       res.status(400).json({
-        message: "Image too dark, please ensure better lighting",
+        message: "Pastikan wajah terlihat jelas di frame",
         code: "ERROR_LOW_LIGHT",
       });
       return;
@@ -184,7 +189,7 @@ router.post("/", upload.single("image"), async (req, res) => {
 
     if (allUsers.length > 0) {
       const labeledDescriptors = allUsers.map((user) => {
-        const desc = JSON.parse(user.descriptor);
+        const desc = user.descriptor;
         return new faceapi.LabeledFaceDescriptors(user.userName, [
           new Float32Array(desc),
         ]);
@@ -196,7 +201,7 @@ router.post("/", upload.single("image"), async (req, res) => {
 
       if (bestMatch.label !== "unknown") {
         res.status(400).json({
-          message: `This face already exists and is registered with ${bestMatch.label}`,
+          message: `Wajah ini sudah terdaftar sebagai ${bestMatch.label}`,
           code: "DUPLICATE_FACE",
         });
         return;
@@ -229,12 +234,12 @@ router.post("/", upload.single("image"), async (req, res) => {
     );
 
     res.status(200).json({
-      message: "Face registered successfully",
+      message: `Wajah berhasil terdaftar sebagai ${username}`,
     });
   } catch (error) {
     console.error("Error register face", error);
     res.status(500).json({
-      message: "Error register face",
+      message: "Terjadi kesalahan saat mendaftarkan wajah",
     });
     return;
   } finally {
