@@ -50,10 +50,6 @@ async function detectSingleRobust(img, opts) {
     .withFaceDescriptor();
   if (d) return d;
 
-  opts = new faceapi.TinyFaceDetectorOptions({
-    inputSize: 608,
-    scoreThreshold: 0.3,
-  });
   d = await faceapi
     .detectSingleFace(img, opts)
     .withFaceLandmarks()
