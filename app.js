@@ -4,6 +4,8 @@ var path = require("path");
 var cookieParser = require("cookie-parser");
 var logger = require("morgan");
 var registerRouter = require("./routes/register");
+const rateLimit = require("express-rate-limit");
+
 require("dotenv").config();
 
 const { initializeAppWrite } = require("./appwrite");
@@ -22,6 +24,7 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, "public")));
 
+const limiter = rateLimit({ windowMs: 60_000, max: 30 });
 app.use("/register", registerRouter);
 
 // catch 404 and forward to error handler
