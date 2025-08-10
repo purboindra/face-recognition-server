@@ -151,7 +151,6 @@ function checkPoseAndCenter(landmarks, box, imgW) {
     };
 
   const yaw = checkYaw(landmarks, { threshold: 0.18 });
-  console.log("yawScore:", yaw.yawScore, "username:", username);
 
   if (!yaw.ok) {
     return {
