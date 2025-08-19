@@ -113,6 +113,7 @@ function checkPitch(landmarks, { low = 0.38, high = 0.62 } = {}) {
 
   const pitchRatio = eyeToMouth / (eyeToMouth + eyeToChin);
   const ok = pitchRatio >= low && pitchRatio <= high;
+
   return {
     ok,
     pitchRatio,
@@ -161,16 +162,16 @@ function checkPoseAndCenter(landmarks, box, imgW) {
     };
   }
 
-  const pitch = checkPitch(landmarks, { low: 0.38, high: 0.62 });
+  // const pitch = checkPitch(landmarks, { low: 0.38, high: 0.62 });
 
-  if (!pitch.ok) {
-    return {
-      ok: false,
-      message: pitch.message,
-      reason: pitch.reason,
-      pitchRatio: pitch.pitchRatio,
-    };
-  }
+  // if (!pitch.ok) {
+  //   return {
+  //     ok: false,
+  //     message: pitch.message,
+  //     reason: pitch.reason,
+  //     pitchRatio: pitch.pitchRatio,
+  //   };
+  // }
 
   const imageCenterX = imgW / 2;
   const faceCenterX = box.x + box.width / 2;
